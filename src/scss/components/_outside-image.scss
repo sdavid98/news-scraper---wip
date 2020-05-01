@@ -1,0 +1,185 @@
+.outside-image {
+    @include media-breakpoint-up(lg) {
+        background-size: contain;
+        background-position-x: 45vw;
+        background-repeat: no-repeat;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position-x: 50vw;
+    }
+
+    &__text {
+        margin-top: 20px;
+        margin-bottom: 22px;
+
+        @include media-breakpoint-up(lg) {
+            margin-bottom: 55px;
+        }
+
+        @include media-breakpoint-up(xl) {
+            margin-bottom: 69px;
+        }
+
+        &--small-bottom {
+            @include media-breakpoint-up(lg) {
+                margin-bottom: 17px;
+            }
+        }
+    }
+
+    &__description {
+        font-size: 18px;
+        line-height: 21px;
+
+        &--bigger-height {
+            line-height: 23px;
+        }
+    }
+
+    &__title {
+        margin-bottom: 12px;
+        line-height: 30px;
+
+        @include media-breakpoint-up(lg) {
+            font-size: 30px;
+            line-height: 1.3em;
+        }
+        @include media-breakpoint-up(xl) {
+            font-size: 36px;
+        }
+
+        &--big {
+            font-size: 30px;
+        }
+    }
+
+    &__content-right {
+        @extend .justify-content-end;
+
+        @include media-breakpoint-up(lg) {
+            .outside-image__text {
+                padding-left: 40px;
+            }
+        }
+    }
+
+    &__highlighted {
+        font-size: 24px;
+        line-height: 24px;
+        font-weight: bold;
+
+        @include media-breakpoint-up(lg) {
+            line-height: 31px;
+            margin-bottom: 23px;
+        }
+    }
+
+    &--homepage {
+        padding-top: 10px;
+        @include media-breakpoint-up(lg) {
+            background-image: url("../images/home-girl.png");
+            padding-top: 35px;
+        }
+        @include media-breakpoint-up(xl) {
+            padding-top: 49px;
+        }
+    }
+
+    &--for-who {
+        @include media-breakpoint-up(lg) {
+            background-image: url("../images/big-eye.png");
+            background-size: auto;
+            padding-top: 72px;
+            padding-bottom: 27px;
+        }
+    }
+
+    &--sore-eye {
+         @include media-breakpoint-up(lg) {
+             background-image: url("../images/big-eye.png");
+             background-size: contain;
+             padding-top: 13px;
+             padding-bottom: 21px;
+         }
+        @include media-breakpoint-up(xl) {
+            background-size: auto;
+        }
+    }
+
+    &--eye-area {
+        @include media-breakpoint-up(lg) {
+            background-image: url("../images/big-eye.png");
+            background-position: right;
+            padding-top: 23px;
+            padding-bottom: 33px;
+        }
+        @include media-breakpoint-up(xl) {
+            background-position: right calc(calc(-0.25 * calc(1200px - 100vw)) - 120px) top;
+            padding: 110px 0;
+        }
+
+        @media (min-width: $breakpoint-xxl) {
+            background-position: right;
+            padding: 130px 0;
+        }
+    }
+
+    &--usage {
+        @include media-breakpoint-up(lg) {
+            background-image: url("../images/big-eye.png");
+            padding-top: 23px;
+            padding-bottom: 18px;
+        }
+        @include media-breakpoint-up(xl) {
+            background-position: right calc(calc(-0.25 * calc(1200px - 100vw)) - 120px) top;
+            padding: 60px 0;
+        }
+
+        @media (min-width: $breakpoint-xxl) {
+            background-position: right;
+        }
+    }
+
+    &--results {
+        @include media-breakpoint-up(lg) {
+            background-image: url("../images/big-eye.png");
+            padding: 30px 0;
+
+            p {
+                line-height: 1.5;
+                font-size: 21px;
+                padding-top: 15px;
+            }
+        }
+
+        @include media-breakpoint-up(xl) {
+            background-position: right calc(calc(-0.25 * calc(1200px - 100vw)) - 120px) top;
+            padding: 60px 0;
+        }
+
+        @media (min-width: $breakpoint-xxl) {
+            background-position: right;
+        }
+
+        .outside-image__title {
+            margin-bottom: 15px;
+        }
+
+        .outside-image__text {
+            margin-top: 13px;
+            margin-bottom: 20px;
+        }
+    }
+
+    &--inverted-color {
+        background-color: $brand-primary-color;
+
+        .outside-image__title,
+        .outside-image__description,
+        .outside-image__text,
+        p {
+            color: $color-for-dark-bg;
+        }
+    }
+}

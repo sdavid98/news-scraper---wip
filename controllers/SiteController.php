@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Article;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -12,30 +13,12 @@ use app\models\ContactForm;
 
 class SiteController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+    public $topicName = 'main';
+
+    public function beforeAction($action)
     {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
+        $this->enableCsrfValidation = false;
+        return parent::beforeAction($action);
     }
 
     /**
@@ -61,42 +44,111 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
-    }
-
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
-
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
+        return $this->render('index', [
+            'model' => Article::find()
+                ->select('article.*, topic.*')
+                ->leftJoin('topic', 'topic.id = article.topic_id')
+                ->orderBy('created DESC')
+                ->all(),
+            'displayConfig' => [
+                'showTopic' => true
+            ]
         ]);
     }
 
     /**
-     * Logout action.
-     *
-     * @return Response
+     * @return string
      */
-    public function actionLogout()
+    public function actionComputers()
     {
-        Yii::$app->user->logout();
+        $this->topicName = 'computers';
 
-        return $this->goHome();
+        return $this->render('index', [
+            'model' => Article::find()
+                ->select('article.*, topic.*')
+                ->leftJoin('topic', 'topic.id = article.topic_id')
+                ->where(['article.topic_id' => '2'])
+                ->orderBy('created DESC')
+                ->all()
+        ]);
     }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionArticle($id)
+    {
+        return $this->render('article/'.$id, ['model' => ['id' => $id]]);
+    }
+
+    public function getTopicByUrl($url) {
+        $response = file_get_contents('https://sandbox.aylien.com/textapi/classify/iab-qag?taxonomy=iab-qag&language=en&url=' . $url);
+        $topic = array_values(json_decode($response)->categories)[0]->label;
+        $myfile = fopen("../topic.txt", "w");
+        fwrite($myfile, $topic);
+        fclose($myfile);
+
+        return $topic;
+    }
+
+    public function getSummaryByUrl($url) {
+        $response = file_get_contents('https://sandbox.aylien.com/textapi/summarize?language=en&sentences_number=8&url=' . $url);
+        $summary = join(' ', json_decode($response)->sentences);
+        $myfile = fopen("../summary.txt", "w");
+        fwrite($myfile, $summary);
+        fclose($myfile);
+
+        return $summary;
+    }
+
+    public function getKeywordsByUrl($url) {
+        $postData = array(
+            'text' => $url,
+            'tab' => 'ae',
+            'options' => [],
+        );
+
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\n",
+                'content' => json_encode($postData)
+            )
+        ));
+        $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
+        $text = json_decode($response)->text;
+
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => "Content-Type: text/plain\r\n",
+                'content' => $text
+            )
+        ));
+        $response = file_get_contents('https://languages.cortical.io/rest/text/keywords?retina_name=en_general', FALSE, $context);
+
+        $myfile = fopen("../kexwords.txt", "w");
+        fwrite($myfile, join(', ', json_decode($response)));
+        fclose($myfile);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionGenerate()
+    {
+
+        if (Yii::$app->request->post('link')) {
+            $topic = $this->getTopicByUrl(Yii::$app->request->post('link'));
+            $summary = $this->getSummaryByUrl(Yii::$app->request->post('link'));
+            $keywords = $this->getKeywordsByUrl(Yii::$app->request->post('link'));
+
+            return $this->render('generate', ['model' => ['id' => $summary]]);
+        }
+        return $this->render('generate', ['model' => ['id' => 'GENERATE']]);
+    }
+
 
     /**
      * Displays contact page.

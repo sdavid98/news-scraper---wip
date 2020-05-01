@@ -1,0 +1,86 @@
+.carousel {
+    margin-top: 25px;
+}
+
+.carousel-control-prev {
+
+    i {
+        padding-right: 3px;
+    }
+}
+
+.carousel-control-next {
+
+    i {
+        padding-left: 3px;
+    }
+}
+
+.carousel-control-next,
+.carousel-control-prev {
+    bottom: 23%;
+    height: 44px;
+    width: 44px;
+    top: unset;
+    background-color: $carousel-arrow-bg-color;
+    border-radius: 50%;
+
+    @include media-breakpoint-up(sm) {
+        -ms-transform: translateX(0);
+        -webkit-transform: translateX(0);
+        -moz-transform: translateX(0);
+        transform: translateX(0);
+        bottom: 30%;
+    }
+
+    @include media-breakpoint-up(lg) {
+        bottom: 50%;
+        height: 65px;
+        width: 65px;
+        -ms-transform: translateY(50%);
+        -webkit-transform: translateY(50%);
+        -moz-transform: translateY(50%);
+        transform: translateY(50%);
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:hover,
+        &:active {
+            i {
+                color: $brand-primary-color;
+            }
+        }
+    }
+
+    i {
+        font-size: 24px;
+        color: $carousel-arrow-color;
+    }
+}
+
+.carousel-indicators {
+    position: relative;
+    margin-bottom: 0;
+    z-index: 1;
+
+    @include media-breakpoint-up(lg) {
+        justify-content: left;
+    }
+
+    li.carousel-indicator {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        opacity: 1;
+
+        &--product-regular.active {
+            background-color: $product-regular-color;
+        }
+        &--product-baby.active {
+            background-color: $product-baby-color;
+        }
+        &--product-plus.active {
+            background-color: $product-plus-color;
+        }
+    }
+}

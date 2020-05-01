@@ -12,6 +12,21 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
+        'assetManager' => [
+            'bundles' => [
+                'yii\web\JqueryAsset' => [
+                    'js'=>[]
+                ],
+                'yii\bootstrap\BootstrapPluginAsset' => [
+                    'js'=>[]
+                ],
+                'yii\bootstrap\BootstrapAsset' => [
+                    'css' => [],
+                ],
+
+            ],
+        ],
+
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'rrZO0KxZVWtxpwJX-JGsUubFaFqqWNBz',
@@ -43,14 +58,24 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'main' => 'site/index',
+                'business' => 'site/business',
+                'sports' => 'site/sports',
+                'health' => 'site/health',
+                'computers' => 'site/computers',
+                'home' => 'site/home',
+                'science' => 'site/science',
+                'society' => 'site/society',
+                'games' => 'site/games',
+                'others' => 'site/others',
+                'generate' => 'site/generate',
+                'articles/<id>' => 'article/index'
             ],
         ],
-        */
     ],
     'params' => $params,
 ];

@@ -21,48 +21,87 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="stylesheet" href="<?= \yii\helpers\Url::base() ?>/css/style.css">
+    <script src="<?= \yii\helpers\Url::base() ?>/js/jquery.js"></script>
+    <script src="<?= \yii\helpers\Url::base() ?>/js/popper.js"></script>
+    <script src="<?= \yii\helpers\Url::base() ?>/js/bootstrap.js"></script>
     <?php $this->head() ?>
 </head>
 <body>
 <?php $this->beginBody() ?>
 
 <div class="wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
-        ],
-    ]);
-    NavBar::end();
-    ?>
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                    <a class="navbar-brand" href="#">Navbar</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="#">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Privacy policy</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Cookie policy</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Contact</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-4">
+        <div class="row">
+            <div class="col">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link<?php if (isset($this->context->topicName) && $this->context->topicName === 'main') echo(' active'); ?>" href="<?= \yii\helpers\Url::base() ?>/main">
+                            main</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/business">business</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/sports">sports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/health">health</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link<?php if (isset($this->context->topicName) && $this->context->topicName === 'computers') echo(' active'); ?>" href="<?= \yii\helpers\Url::base() ?>/computers">
+                            computers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/home">home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/science">science</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/society">society</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/games">games</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::base() ?>/others">others</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
         <?= $content ?>
     </div>
 </div>
@@ -74,7 +113,7 @@ AppAsset::register($this);
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
-
+<script src="<?= \yii\helpers\Url::base() ?>/js/build.js"></script>
 <?php $this->endBody() ?>
 </body>
 </html>

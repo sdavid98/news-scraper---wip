@@ -1,0 +1,65 @@
+.plain-text {
+    padding-top: 20px;
+    padding-bottom: 9px;
+
+    p {
+        @include media-breakpoint-up(lg) {
+            margin-bottom: 20px;
+        }
+
+        &.plain-text__highlighted {
+            font-weight: bold;
+            font-size: 24px;
+            line-height: 31px;
+        }
+    }
+
+    strong {
+        color: inherit;
+    }
+
+    &__title {
+        line-height: 39px;
+    }
+
+    &--invert {
+        background-color: $brand-primary-color;
+
+        h2,
+        p {
+            color: $color-for-dark-bg;
+        }
+
+        p {
+            margin-top: 10px;
+            font-size: 18px;
+            line-height: 23px;
+        }
+    }
+
+
+
+    &--results {
+        padding-top: 30px;
+        padding-bottom: 4px;
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 46px;
+            padding-bottom: 8px;
+        }
+
+        p {
+            line-height: 18px;
+        }
+
+        .bigger-title {
+            line-height: 39px;
+            margin-top: 3px;
+            margin-bottom: 19px;
+
+            @include media-breakpoint-up(lg) {
+                line-height: 47px;
+            }
+        }
+    }
+}

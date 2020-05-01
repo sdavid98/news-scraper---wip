@@ -1,0 +1,160 @@
+.product-info {
+    margin-bottom: 19px;
+
+    @include media-breakpoint-up(lg) {
+        padding-top: 50px;
+    }
+
+    &__product-name {
+        text-transform: uppercase;
+        font-size: 18px;
+        margin-bottom: 5px;
+
+        &--regular {
+            color: $product-regular-color;
+            strong {
+                color: $product-regular-color;
+            }
+        }
+    }
+
+    &__title {
+        font-size: 30px;
+        margin-bottom: 10px;
+        color: inherit;
+
+        &--invert {
+            color: $color-for-dark-bg;
+        }
+
+        @include media-breakpoint-up(lg) {
+            font-size: 36px;
+            line-height: 47px;
+        }
+    }
+
+    &__list-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+
+        &--regular {
+            color: $product-regular-color;
+        }
+    }
+
+    &__list {
+        list-style: none;
+        padding-left: 20px;
+        margin-bottom: 15px;
+    }
+
+    &__list-item {
+        font-size: 14px;
+        line-height: 18px;
+
+        &:before {
+            content: "";
+            width: 9px;
+            height: 9px;
+            display: inline-block;
+            margin-left: -15px;
+            margin-right: 6px;
+            margin-top: 4px;
+            border-radius: 50%;
+        }
+    }
+
+    &__big-list {
+        list-style: none;
+        padding-left: 20px;
+    }
+
+    &__big-list-item {
+        font-size: 18px;
+        line-height: 23px;
+        margin-bottom: 10px;
+        color: $color-for-dark-bg;
+
+        &:before {
+            content: "";
+            width: 9px;
+            height: 9px;
+            display: inline-block;
+            margin-left: -15px;
+            margin-right: 6px;
+            margin-top: 7px;
+            border-radius: 50%;
+            background-color: $color-for-dark-bg;
+        }
+    }
+
+    &__button {
+        text-transform: uppercase;
+        width: 100%;
+        max-width: 310px;
+        padding: 13px 0;
+        font-weight: bold;
+        border-radius: 6px;
+        font-size: 14px;
+        display: block;
+        margin: 0 auto;
+        color: $homepage-product-button-color;
+
+        @include media-breakpoint-up(lg) {
+            margin: 0;
+            max-width: 215px;
+        }
+    }
+
+    &__image {
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        overflow-x: hidden;
+
+        img {
+            margin-left: 50%;
+            padding: 0 15px;
+            transform: translateX(-50%);
+        }
+
+        &--regular {
+            @include media-breakpoint-up(lg) {
+                background-image: url("../images/Box-Ocuvane-2.png");
+            }
+        }
+        &--baby {
+            @include media-breakpoint-up(lg) {
+                background-image: url("../images/Box-Ocuvane-Baby-2.png");
+            }
+        }
+        &--plus {
+            @include media-breakpoint-up(lg) {
+                background-image: url("../images/Box-Ocuvane-Plus-2.png");
+            }
+        }
+    }
+
+    &--regular {
+        color: $product-regular-color;
+        .product-info__button,
+        .product-info__list-item:before {
+            background-color: $product-regular-color;
+        }
+    }
+    &--baby {
+        color: $product-baby-color;
+        .product-info__button,
+        .product-info__list-item:before {
+            background-color: $product-baby-color;
+        }
+    }
+    &--plus {
+        color: $product-plus-color;
+        .product-info__button,
+        .product-info__list-item:before {
+            background-color: $product-plus-color;
+        }
+    }
+}

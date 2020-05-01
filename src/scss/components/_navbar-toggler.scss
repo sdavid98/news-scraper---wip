@@ -1,0 +1,55 @@
+.navbar-toggler {
+    width: 31px;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    margin-right: 15px;
+
+    @include media-breakpoint-up(sm) {
+        margin-right: calc(calc(calc(100vw - 540px) / 2) + 15px);
+    }
+
+    @include media-breakpoint-up(md) {
+        margin-right: calc(calc(calc(100vw - 720px) / 2) + 15px);
+    }
+
+    @include media-breakpoint-up(lg) {
+        margin-right: 0;
+    }
+
+    &__icon {
+        height: 5px;
+        width: 31px;
+        background-color: $brand-primary-color;
+        background-image: none;
+        display: block;
+
+        &:nth-of-type(2) {
+            margin: 4px 0;
+        }
+    }
+
+    &:focus {
+        outline: 0;
+    }
+}
+
+.navbar-toggler[aria-expanded="true"] {
+    .navbar-toggler__icon {
+        width: 36px;
+        height: 2px;
+        background-color: $product-regular-color;
+        position: absolute;
+
+        &:nth-of-type(1) {
+            transform: rotate(45deg);
+        }
+        &:nth-of-type(2) {
+            transform: rotate(-45deg);
+            margin: 0;
+        }
+        &:nth-of-type(3) {
+            display: none;
+        }
+    }
+}

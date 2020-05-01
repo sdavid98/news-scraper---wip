@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $code
  * @property string $filename
+ * @property string $title
  * @property string|null $created
  * @property int|null $points
  * @property int $topic_id
@@ -69,6 +70,18 @@ class Article extends \yii\db\ActiveRecord
         ];
     }
 
+    public function generateCode()
+    {
+        $result = '';
+
+        $t=time();
+        foreach (str_split(strval($t)) as $n) {
+            $result .= strtolower(chr(64 + $n));
+        }
+
+        return $result;
+    }
+
     /**
      * Gets query for [[Topic]].
      *
@@ -79,25 +92,6 @@ class Article extends \yii\db\ActiveRecord
         return $this->hasOne(Topic::className(), ['id' => 'topic_id']);
     }
 
-    /**
-     * Gets query for [[User]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUser()
-    {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
-    }
-
-    /**
-     * Gets query for [[Comments]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getComments()
-    {
-        return $this->hasMany(Comment::className(), ['article_id' => 'id']);
-    }
 
     /**
      * Gets query for [[Keywords]].
@@ -107,25 +101,5 @@ class Article extends \yii\db\ActiveRecord
     public function getKeywords()
     {
         return $this->hasMany(Keyword::className(), ['article_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Userlikes]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserlikes()
-    {
-        return $this->hasMany(Userlike::className(), ['article_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Usersaveds]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUsersaveds()
-    {
-        return $this->hasMany(Usersaved::className(), ['article_id' => 'id']);
     }
 }

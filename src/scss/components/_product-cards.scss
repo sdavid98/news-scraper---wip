@@ -1,0 +1,85 @@
+.product-cards {
+    background-color: $secondary-bg-color;
+    padding-top: 15px;
+    padding-bottom: 30px;
+}
+
+.product-card {
+    @extend .card;
+    margin: 15px 0;
+    border: none;
+    border-radius: 6px;
+
+    h2 {
+        color: $product-card-color;
+        text-align: center;
+    }
+
+    p {
+        color: $product-card-color;
+        margin: 9px 0;
+        text-align: center;
+        padding: 0 5px;
+    }
+
+    &__image {
+        padding: 15px 43px;
+        background-color: $product-card-color;
+        border-top-right-radius: 6px;
+        border-top-left-radius: 6px;
+    }
+
+    &__body {
+        padding-top: 9px;
+    }
+
+    &__button {
+        color: $brand-primary-color;
+        background-color: $product-card-color;
+        text-transform: uppercase;
+        padding: 13px 17px;
+        font-size: 14px;
+        line-height: 18px;
+        font-weight: bold;
+        border-radius: 6px;
+        margin: 0 auto;
+        margin-bottom: 16px;
+        display: block;
+
+        @include media-breakpoint-between(md, lg) {
+            padding: 8px;
+        }
+    }
+
+    &--regular {
+        background-color: $product-regular-color;
+        .product-card__button:hover,
+        .product-card__button:active {
+            background-color: $regular-product-button-hover-bg-color;
+        }
+    }
+    &--baby {
+        background-color: $product-baby-color;
+        .product-card__button:hover,
+        .product-card__button:active {
+            background-color: $baby-product-button-hover-bg-color;
+        }
+    }
+    &--plus {
+        background-color: $product-plus-color;
+        .product-card__button:hover,
+        .product-card__button:active {
+            background-color: $plus-product-button-hover-bg-color;
+        }
+    }
+
+    &:nth-of-type(2) {
+        @include media-breakpoint-down(md) {
+            margin-right: 0;
+            margin-left: 0;
+        }
+    }
+}
+
+
+

@@ -1,0 +1,51 @@
+.product-list {
+    padding-left: 27px;
+
+    &__title {
+        margin-bottom: 4px;
+    }
+
+    &__item {
+        font-size: 22px;
+        line-height: 23px;
+        margin-bottom: 8px;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+
+        &--small {
+            font-size: 20px;
+            line-height: 18px;
+            margin-bottom: 0;
+        }
+    }
+
+    &__item-text {
+        position: relative;
+        left: -7px;
+        font-size: 18px;
+        word-spacing: -1px;
+
+        &--small {
+            font-size: 14px;
+        }
+
+        &--tiny {
+            font-size: 12px;
+        }
+    }
+
+    &--baby-eye {
+        margin-top: 5px;
+        margin-bottom: 21px;
+
+        .product-list__item {
+            margin-bottom: 8px;
+        }
+
+        .product-list__item-text {
+            vertical-align: top;
+        }
+    }
+}
