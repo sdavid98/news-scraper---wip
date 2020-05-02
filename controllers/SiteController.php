@@ -117,6 +117,7 @@ class SiteController extends Controller
             )
         ));
         $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
+        //got the title too
         $text = json_decode($response)->text;
 
         $context = stream_context_create(array(
@@ -133,6 +134,47 @@ class SiteController extends Controller
         fclose($myfile);
     }
 
+    function getDomain($url) {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if(filter_var($host,FILTER_VALIDATE_IP)) {
+            // IP address returned as domain
+            return $host; //* or replace with null if you don't want an IP back
+        }
+
+        $domain_array = explode(".", str_replace('www.', '', $host));
+        $count = count($domain_array);
+        if( $count>=3 && strlen($domain_array[$count-2])==2 ) {
+            // SLD (example.co.uk)
+            return implode('.', array_splice($domain_array, $count-3,3));
+        } else if( $count>=2 ) {
+            // TLD (example.com)
+            return implode('.', array_splice($domain_array, $count-2,2));
+        }
+    }
+
+    public function getSourceLogoByUrl($url) {
+        $saveto = '../src/images/source-logos/logo.jpg';
+
+        $ch = curl_init ('https://logo.clearbit.com/'.parse_url($url)['host']);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        $raw=curl_exec($ch);
+        curl_close ($ch);
+
+        /*if(file_exists($saveto)){
+            unlink($saveto);
+        }*/
+        $fp = fopen($saveto,'w+');
+        fwrite($fp, $raw);
+        fclose($fp);
+
+        return true;
+    }
+
     /**
      * @return string
      */
@@ -140,11 +182,12 @@ class SiteController extends Controller
     {
 
         if (Yii::$app->request->post('link')) {
-            $topic = $this->getTopicByUrl(Yii::$app->request->post('link'));
-            $summary = $this->getSummaryByUrl(Yii::$app->request->post('link'));
-            $keywords = $this->getKeywordsByUrl(Yii::$app->request->post('link'));
+            //$topic = $this->getTopicByUrl(Yii::$app->request->post('link'));
+            //$summary = $this->getSummaryByUrl(Yii::$app->request->post('link'));
+            //$keywords = $this->getKeywordsByUrl(Yii::$app->request->post('link'));
+            $logo = $this->getSourceLogoByUrl(Yii::$app->request->post('link'));
 
-            return $this->render('generate', ['model' => ['id' => $summary]]);
+            return $this->render('generate', ['model' => ['id' => $logo]]);
         }
         return $this->render('generate', ['model' => ['id' => 'GENERATE']]);
     }

@@ -23,6 +23,10 @@ class Topic extends \yii\db\ActiveRecord
         return 'topic';
     }
 
+    public static function getTopicIdByTopicName($name) {
+        return self::findOne(['topic_title' => trim(strtolower($name))])->id;
+    }
+
     /**
      * {@inheritdoc}
      */
