@@ -90,10 +90,31 @@ class Article extends \yii\db\ActiveRecord
         }
         if ($article->save()) {
             Keyword::saveKeywords($article->getPrimaryKey(), $data['keywords']);
+            $article->writeArticleFile($data['summary'], self::findOne($article->getPrimaryKey()));
             return $article->getPrimaryKey();
         }
 
         return 'ehhhh';
+    }
+
+    public function writeArticleFile($text, $article) {
+        $keywords = [];
+        foreach (Keyword::findAll(['article_id' => $article->id]) as $keyword) {
+            array_push($keywords, $keyword->keyword);
+        }
+        $content = [
+            'created' => $article->created,
+            'logo' => Sourcelogo::findOne($article->sourcelogo_id)->imagename,
+            'title' => $article->title,
+            'link' => $article->external_link,
+            'topicName' => Topic::findOne($article->topic_id)->topic_title,
+            'keywords' => $keywords,
+            'text' => $text
+        ];
+
+        file_put_contents("../views/article/" . $this->filename . ".php", print_r(trim('<?php $info = ', "'"), true));
+        file_put_contents("../views/article/" . $this->filename . ".php", var_export($content, true), FILE_APPEND);
+        file_put_contents("../views/article/" . $this->filename . ".php", print_r(trim(";\r\ninclude '../src/article-body.php';", '"'), true), FILE_APPEND);
     }
 
     public static function createArticleDataFromUrl($url)
@@ -110,7 +131,7 @@ class Article extends \yii\db\ActiveRecord
             [$articleData['newLogo'], $articleData['logo']] = Sourcelogo::getImageByUrl($url);
         }
         $articleData['code'] = self::generateCode();
-        $articleData['filename'] = urlencode(strtolower(preg_replace("/[^0-9a-zA-Z \-]/", "", $articleData['title'] . '-' . $articleData['code'])));
+        $articleData['filename'] = str_replace('+', '-' , urlencode(strtolower(preg_replace("/[^0-9a-zA-Z \-]/", "", $articleData['title'] . '-' . $articleData['code']))));
 
         return $articleData;
     }
@@ -126,7 +147,7 @@ class Article extends \yii\db\ActiveRecord
 
         $t=time();
         foreach (str_split(strval($t)) as $n) {
-            $result .= strtolower(chr(64 + $n));
+            $result .= strtolower(chr(65 + $n));
         }
 
         return $result;
