@@ -64,7 +64,7 @@ class Keyword extends \yii\db\ActiveRecord
             )
         ));
         $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
-        $title = json_decode($response)->title;
+        $title = json_decode($response)->{'article title'};
         $text = json_decode($response)->text;
 
         $context = stream_context_create(array(

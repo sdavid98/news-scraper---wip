@@ -184,8 +184,9 @@ class SiteController extends Controller
         if (Yii::$app->request->post('link')) {
             $url = Yii::$app->request->post('link');
             $createdArticleData = Article::createArticleDataFromUrl($url);
+            $articleId = Article::saveArticleFromGeneratedData($createdArticleData);
 
-            return $this->render('generate', ['model' => $createdArticleData]);
+            return $this->render('generate', ['model' => ['id' => $articleId]]);
         }
         return $this->render('generate', ['model' => ['id' => 'GENERATE']]);
     }

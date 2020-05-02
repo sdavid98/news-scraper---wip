@@ -24,12 +24,12 @@ class Sourcelogo extends \yii\db\ActiveRecord
     }
 
     public static function getImageByUrl($url) {
-        $domain = Article::getDomain(parse_url($url)['host']);
+        $domain = parse_url($url)['host'];
         if (self::findOne(['host' => trim($domain)])) {
             return self::findOne(['host' => trim($domain)])->imagename;
         }
         else {
-            $saveto = '../web/assets/images/source-logos/' . $domain . 'png';
+            $saveto = '../web/assets/images/source-logos/' . $domain . '.png';
 
             $ch = curl_init ('https://logo.clearbit.com/'.$domain);
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -50,7 +50,7 @@ class Sourcelogo extends \yii\db\ActiveRecord
             }
 
             if (file_exists($saveto)) {
-                return $domain . 'png';
+                return $domain . '.png';
             }
         }
     }
