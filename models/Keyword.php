@@ -49,6 +49,37 @@ class Keyword extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function getTitleAndKeywordsByUrl($url) {
+        $postData = array(
+            'text' => $url,
+            'tab' => 'ae',
+            'options' => [],
+        );
+
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\n",
+                'content' => json_encode($postData)
+            )
+        ));
+        $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
+        $title = json_decode($response)->title;
+        $text = json_decode($response)->text;
+
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => "Content-Type: text/plain\r\n",
+                'content' => $text
+            )
+        ));
+        $response = file_get_contents('https://languages.cortical.io/rest/text/keywords?retina_name=en_general', FALSE, $context);
+        $keywords = json_decode($response);
+
+        return [$title, $keywords];
+    }
+
     /**
      * Gets query for [[Article]].
      *

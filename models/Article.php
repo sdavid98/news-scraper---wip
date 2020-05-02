@@ -74,48 +74,18 @@ class Article extends \yii\db\ActiveRecord
     {
         $article = array();
         $article['external_link'] = $url;
-        $article['topic_id'] = self::getTopicIdByUrl($url);
+        $article['topic'] = Topic::getTopicNameByUrl($url);
+        $article['topic_id'] = Topic::getTopicIdByTopicName($article['topic']);
         [$article['summary'], $article['first_row']] = self::getSummaryByUrl($url);
-        [$article['title'], $article['keywords']] = self::getTitleAndKeywordsByUrl($url);
-        $article['logo'] = self::getSourceLogoByUrl($url);
+        [$article['title'], $article['keywords']] = Keyword::getTitleAndKeywordsByUrl($url);
+        $article['logo'] = $article['topic'] . '-fallback.png';
+        if (Sourcelogo::getImageByUrl($url)) {
+            $article['logo'] = Sourcelogo::getImageByUrl($url);
+        }
         $article['code'] = self::generateCode();
         $article['filename'] = $article['title'] . $article['code'];
 
-    }
-
-    public static function getTopicIdByUrl($url) {
-        $response = file_get_contents('https://sandbox.aylien.com/textapi/classify/iab-qag?taxonomy=iab-qag&language=en&url=' . $url);
-        //$topic = array_values(json_decode($response)->categories)[0]->label;
-        $myTopic = '';
-        $topics = json_decode($response)->categories;
-        foreach ($topics as $topic) {
-            if (in_array($topic->label, ['Business', 'Careers'])) {
-                $myTopic = 'business';
-                break;
-            }
-            if (in_array($topic->label, ['Health & Fitness', 'Food & Drink'])) {
-                $myTopic = 'health';
-                break;
-            }
-            if (in_array($topic->label, ['Arts & Entertainment', 'Hobbies & Interests'])) {
-                $myTopic = 'entertainment';
-                break;
-            }
-            if (in_array($topic->label, ['Education', 'Careers', 'Family & Parenting'])) {
-                $myTopic = 'society';
-                break;
-            }
-            if (in_array($topic->label, ['Law,Gov\'t & Politics', 'Careers'])) {
-                $myTopic = 'politics';
-                break;
-            }
-            if (in_array($topic->label, ['News', 'Home & Garden', 'Automotive'])) {
-                $myTopic = 'others';
-                break;
-            }
-        }
-
-        return Topic::getTopicIdByTopicName($myTopic);
+        return $article;
     }
 
     public static function getSummaryByUrl($url) {
@@ -123,55 +93,23 @@ class Article extends \yii\db\ActiveRecord
         return [join(' ', json_decode($response)->sentences), json_decode($response)->sentences[0]];
     }
 
+    public static function getDomain($url) {
+        $host = parse_url($url, PHP_URL_HOST);
 
-    public static function getTitleAndKeywordsByUrl($url) {
-        $postData = array(
-            'text' => $url,
-            'tab' => 'ae',
-            'options' => [],
-        );
+        if(filter_var($host,FILTER_VALIDATE_IP)) {
+            // IP address returned as domain
+            return $host; //* or replace with null if you don't want an IP back
+        }
 
-        $context = stream_context_create(array(
-            'http' => array(
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
-                'content' => json_encode($postData)
-            )
-        ));
-        $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
-        $title = json_decode($response)->title;
-        $text = json_decode($response)->text;
-
-        $context = stream_context_create(array(
-            'http' => array(
-                'method' => 'POST',
-                'header' => "Content-Type: text/plain\r\n",
-                'content' => $text
-            )
-        ));
-        $response = file_get_contents('https://languages.cortical.io/rest/text/keywords?retina_name=en_general', FALSE, $context);
-        $keywords = json_decode($response);
-
-        return [$title, $keywords];
-    }
-
-    public static function getSourceLogoByUrl($url) {
-        $saveto = '../src/images/source-logos/logo.jpg';
-
-        $ch = curl_init ('https://logo.clearbit.com/'.parse_url($url)['host']);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        $raw=curl_exec($ch);
-        curl_close ($ch);
-
-        $fp = fopen($saveto,'w');
-        fwrite($fp, $raw);
-        fclose($fp);
-
-        return true;
+        $domain_array = explode(".", str_replace('www.', '', $host));
+        $count = count($domain_array);
+        if( $count>=3 && strlen($domain_array[$count-2])==2 ) {
+            // SLD (example.co.uk)
+            return implode('.', array_splice($domain_array, $count-3,3));
+        } else if( $count>=2 ) {
+            // TLD (example.com)
+            return implode('.', array_splice($domain_array, $count-2,2));
+        }
     }
 
     public static function generateCode()

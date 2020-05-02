@@ -182,12 +182,10 @@ class SiteController extends Controller
     {
 
         if (Yii::$app->request->post('link')) {
-            //$topic = $this->getTopicByUrl(Yii::$app->request->post('link'));
-            //$summary = $this->getSummaryByUrl(Yii::$app->request->post('link'));
-            //$keywords = $this->getKeywordsByUrl(Yii::$app->request->post('link'));
-            $logo = $this->getSourceLogoByUrl(Yii::$app->request->post('link'));
+            $url = Yii::$app->request->post('link');
+            $createdArticleData = Article::createArticleDataFromUrl($url);
 
-            return $this->render('generate', ['model' => ['id' => $logo]]);
+            return $this->render('generate', ['model' => $createdArticleData]);
         }
         return $this->render('generate', ['model' => ['id' => 'GENERATE']]);
     }
