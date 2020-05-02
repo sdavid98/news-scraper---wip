@@ -32,7 +32,6 @@ class Keyword extends \yii\db\ActiveRecord
             [['article_id', 'keyword'], 'required'],
             [['article_id'], 'integer'],
             [['keyword'], 'string', 'max' => 45],
-            [['keyword'], 'unique'],
             [['article_id'], 'exist', 'skipOnError' => true, 'targetClass' => Article::className(), 'targetAttribute' => ['article_id' => 'id']],
         ];
     }
@@ -47,6 +46,15 @@ class Keyword extends \yii\db\ActiveRecord
             'article_id' => 'Article ID',
             'keyword' => 'Keyword',
         ];
+    }
+
+    public static function saveKeywords($articleId, $keywords) {
+        foreach ($keywords as $keyword) {
+            $key = new Keyword();
+            $key->article_id = $articleId;
+            $key->keyword = $keyword;
+            $key->save();
+        }
     }
 
     public static function getTitleAndKeywordsByUrl($url) {

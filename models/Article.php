@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use phpDocumentor\Reflection\Types\Null_;
 use Yii;
 
 /**
@@ -80,8 +81,15 @@ class Article extends \yii\db\ActiveRecord
         $article->title = $data['title'];
         $article->first_row = $data['first_row'];
         $article->external_link = $data['external_link'];
-        //insert logo to get id
+        $article->sourcelogo_id = $data['logo'];
+        if ($data['newLogo']) {
+            $logo_id = Sourcelogo::saveLogoFromFilename($data['logo']);
+            if ($logo_id) {
+                $article->sourcelogo_id = $logo_id;
+            }
+        }
         if ($article->save()) {
+            Keyword::saveKeywords($article->getPrimaryKey(), $data['keywords']);
             return $article->getPrimaryKey();
         }
 
@@ -96,9 +104,10 @@ class Article extends \yii\db\ActiveRecord
         $articleData['topic_id'] = Topic::getTopicIdByTopicName($articleData['topic']);
         [$articleData['summary'], $articleData['first_row']] = self::getSummaryByUrl($url);
         [$articleData['title'], $articleData['keywords']] = Keyword::getTitleAndKeywordsByUrl($url);
-        $articleData['logo'] = $articleData['topic'] . '-fallback.png';
-        if (Sourcelogo::getImageByUrl($url)) {
-            $articleData['logo'] = Sourcelogo::getImageByUrl($url);
+        $articleData['logo'] = Sourcelogo::getFallbackImageIdByTopic($articleData['topic']);
+        $articleData['newLogo'] = false;
+        if (count(Sourcelogo::getImageByUrl($url)) > 1) {
+            [$articleData['newLogo'], $articleData['logo']] = Sourcelogo::getImageByUrl($url);
         }
         $articleData['code'] = self::generateCode();
         $articleData['filename'] = urlencode(strtolower(preg_replace("/[^0-9a-zA-Z \-]/", "", $articleData['title'] . '-' . $articleData['code'])));

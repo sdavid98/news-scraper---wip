@@ -23,10 +23,28 @@ class Sourcelogo extends \yii\db\ActiveRecord
         return 'sourcelogo';
     }
 
+    public static function getFallbackImageIdByTopic($topic) {
+        return self::findOne(['imagename' => $topic . '-fallback.png'])->id;
+    }
+
+    public static function saveLogoFromFilename($name) {
+        $logo = new Sourcelogo();
+        $logo->host = rtrim($name, '.png');
+        $logo->imagename = $name;
+        if ($logo->save()) {
+            return $logo->getPrimaryKey();
+        }
+
+        return false;
+    }
+
     public static function getImageByUrl($url) {
         $domain = parse_url($url)['host'];
         if (self::findOne(['host' => trim($domain)])) {
-            return self::findOne(['host' => trim($domain)])->imagename;
+            return [false, self::findOne(['host' => trim($domain)])->id];
+        }
+        elseif (file_exists('../web/assets/images/source-logos/' . $domain . '.png')) {
+            return [false, self::saveLogoFromFilename($domain . '.png')];
         }
         else {
             $saveto = '../web/assets/images/source-logos/' . $domain . '.png';
@@ -50,7 +68,7 @@ class Sourcelogo extends \yii\db\ActiveRecord
             }
 
             if (file_exists($saveto)) {
-                return $domain . '.png';
+                return[true, $domain . '.png'];
             }
         }
     }
@@ -61,10 +79,10 @@ class Sourcelogo extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['host', 'image'], 'required'],
+            [['host', 'imagename'], 'required'],
             [['host'], 'string', 'max' => 50],
             [['host'], 'unique'],
-            [['image'], 'string', 'max' => 80]
+            [['imagename'], 'string', 'max' => 80]
         ];
     }
 
