@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\Article;
+use app\models\Keyword;
+use app\models\Sourcelogo;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -51,7 +53,16 @@ class ArticleController extends Controller
      */
     public function actionIndex($id)
     {
-        return $this->render($id, ['model' => ['id' => $id]]);
+        $model = [];
+        $model['article'] = Article::find()
+            ->select('article.*, topic.topic_title')
+            ->leftJoin('topic', 'topic.id = article.topic_id')
+            ->where(['article.filename' => $id])
+            ->one();
+        $model['keywords'] = Keyword::find()->select('keyword')->where(['article_id' => $model['article']->id])->all();
+        $model['logo'] = Sourcelogo::find()->select('imagename')->where(['id' => $model['article']->sourcelogo_id])->one();
+
+        return $this->render('article', ['model' => $model]);
     }
 
 }
