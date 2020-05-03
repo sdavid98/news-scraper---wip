@@ -38,13 +38,10 @@ class Sourcelogo extends \yii\db\ActiveRecord
         return false;
     }
 
-    public static function getImageByUrl($url) {
+    public static function getImageIdByUrl($url) {
         $domain = parse_url($url)['host'];
         if (self::findOne(['host' => trim($domain)])) {
-            return [false, self::findOne(['host' => trim($domain)])->id];
-        }
-        elseif (file_exists('../web/assets/images/source-logos/' . $domain . '.png')) {
-            return [false, self::saveLogoFromFilename($domain . '.png')];
+            return self::findOne(['host' => trim($domain)])->id;
         }
         else {
             $saveto = '../web/assets/images/source-logos/' . $domain . '.png';
@@ -62,13 +59,13 @@ class Sourcelogo extends \yii\db\ActiveRecord
                 $fp = fopen($saveto,'w');
                 fwrite($fp, $raw);
                 fclose($fp);
+
+                if (file_exists($saveto)) {
+                    return self::saveLogoFromFilename($domain . '.png');
+                }
             }
             else {
                 return false;
-            }
-
-            if (file_exists($saveto)) {
-                return[true, $domain . '.png'];
             }
         }
     }

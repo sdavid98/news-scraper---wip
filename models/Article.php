@@ -19,6 +19,7 @@ use Yii;
  * @property string $external_link
  * @property string $first_row
  * @property int|null $sourcelogo_id
+ * @property string $summary
  *
  * @property Topic $topic
  * @property User $user
@@ -43,7 +44,7 @@ class Article extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['code', 'filename', 'topic_id', 'external_link'], 'required'],
+            [['code', 'filename', 'topic_id', 'external_link', 'summary'], 'required'],
             [['created'], 'safe'],
             [['points', 'topic_id', 'user_id'], 'integer'],
             [['code'], 'string', 'max' => 20],
@@ -73,28 +74,29 @@ class Article extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function saveArticleFromGeneratedData($data) {
+    public static function saveArticleFromGeneratedData($url) {
+        [$title, $keywords] = Keyword::getTitleAndKeywordsByUrl($url);
+        $topicName = Topic::getTopicNameByUrl($url);
+
         $article = new Article();
-        $article->code = $data['code'];
-        $article->topic_id = $data['topic_id'];
-        $article->filename = $data['filename'];
-        $article->title = $data['title'];
-        $article->first_row = $data['first_row'];
-        $article->external_link = $data['external_link'];
-        $article->sourcelogo_id = $data['logo'];
-        if ($data['newLogo']) {
-            $logo_id = Sourcelogo::saveLogoFromFilename($data['logo']);
-            if ($logo_id) {
-                $article->sourcelogo_id = $logo_id;
-            }
+        $article->code = self::generateCode();
+        $article->topic_id = Topic::getTopicIdByTopicName($topicName);
+        $article->title = $title;
+        $article->filename = str_replace('+', '-' , urlencode(strtolower(preg_replace("/[^0-9a-zA-Z \-]/", "", $article->title . '-' . $article->code))));
+        [$article->summary, $article->first_row] = self::getSummaryByUrl($url);
+        $article->external_link = $url;
+
+        $article->sourcelogo_id = Sourcelogo::getFallbackImageIdByTopic($topicName);
+        if (Sourcelogo::getImageIdByUrl($url)) {
+            $article->sourcelogo_id = Sourcelogo::getImageIdByUrl($url);
         }
+
         if ($article->save()) {
-            Keyword::saveKeywords($article->getPrimaryKey(), $data['keywords']);
-            $article->writeArticleFile($data['summary'], self::findOne($article->getPrimaryKey()));
+            Keyword::saveKeywords($article->getPrimaryKey(), $keywords);
             return $article->getPrimaryKey();
         }
 
-        return 'ehhhh';
+        return false;
     }
 
     public function writeArticleFile($text, $article) {
@@ -115,25 +117,6 @@ class Article extends \yii\db\ActiveRecord
         file_put_contents("../views/article/" . $this->filename . ".php", print_r(trim('<?php $info = ', "'"), true));
         file_put_contents("../views/article/" . $this->filename . ".php", var_export($content, true), FILE_APPEND);
         file_put_contents("../views/article/" . $this->filename . ".php", print_r(trim(";\r\ninclude '../src/article-body.php';", '"'), true), FILE_APPEND);
-    }
-
-    public static function createArticleDataFromUrl($url)
-    {
-        $articleData = array();
-        $articleData['external_link'] = $url;
-        $articleData['topic'] = Topic::getTopicNameByUrl($url);
-        $articleData['topic_id'] = Topic::getTopicIdByTopicName($articleData['topic']);
-        [$articleData['summary'], $articleData['first_row']] = self::getSummaryByUrl($url);
-        [$articleData['title'], $articleData['keywords']] = Keyword::getTitleAndKeywordsByUrl($url);
-        $articleData['logo'] = Sourcelogo::getFallbackImageIdByTopic($articleData['topic']);
-        $articleData['newLogo'] = false;
-        if (count(Sourcelogo::getImageByUrl($url)) > 1) {
-            [$articleData['newLogo'], $articleData['logo']] = Sourcelogo::getImageByUrl($url);
-        }
-        $articleData['code'] = self::generateCode();
-        $articleData['filename'] = str_replace('+', '-' , urlencode(strtolower(preg_replace("/[^0-9a-zA-Z \-]/", "", $articleData['title'] . '-' . $articleData['code']))));
-
-        return $articleData;
     }
 
     public static function getSummaryByUrl($url) {
