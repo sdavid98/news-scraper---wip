@@ -120,7 +120,7 @@ class Article extends \yii\db\ActiveRecord
     }
 
     public static function getSummaryByUrl($url) {
-        $response = file_get_contents('https://sandbox.aylien.com/textapi/summarize?language=en&sentences_number=8&url=' . $url);
+        $response = file_get_contents('https://sandbox.aylien.com/textapi/summarize?language=en&sentences_number=10&url=' . $url);
         return [join(' ', json_decode($response)->sentences), substr(json_decode($response)->sentences[0], 0, 120)];
     }
 
