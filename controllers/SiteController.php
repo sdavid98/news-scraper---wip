@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use app\models\Article;
+use app\models\Keyword;
 use Yii;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -44,12 +46,16 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $query = new Query();
+        $query->select('article.*, topic.topic_title, sourcelogo.imagename, GROUP_CONCAT(keyword.keyword) as keywords')
+            ->from('article')
+            ->leftJoin('topic', 'topic.id = article.topic_id')
+            ->leftJoin('sourcelogo', 'sourcelogo.id = article.sourcelogo_id')
+            ->leftJoin('keyword', 'keyword.article_id = article.id')
+            ->groupBy('article.id')
+            ->orderBy('article.created DESC');
         return $this->render('index', [
-            'model' => Article::find()
-                ->select('article.*, topic.*')
-                ->leftJoin('topic', 'topic.id = article.topic_id')
-                ->orderBy('created DESC')
-                ->all(),
+            'model' => $query->all(),
             'displayConfig' => [
                 'showTopic' => true
             ]
