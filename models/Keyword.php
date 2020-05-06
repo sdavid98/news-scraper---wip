@@ -88,6 +88,10 @@ class Keyword extends \yii\db\ActiveRecord
         return [$title, $keywords];
     }
 
+    public static function getKeywordsForSearchByFirstLetters($letters) {
+        return self::find()->select('keyword')->where('keyword LIKE :substr', array(':substr' => $letters.'%'))->orderBy('CHAR_LENGTH(keyword)')->limit('7')->all();
+    }
+
     /**
      * Gets query for [[Article]].
      *

@@ -102,6 +102,106 @@ AppAsset::register($this);
         </div>
     </div>
     <div class="container">
+        <div class="row">
+            <div class="col">
+                <form id="keySearch" method="post" action="">
+                    <div class="form-group">
+                        <label for="keywordSearchInput">Article Link</label>
+                        <input type="text" name="keywordSearchInput" class="form-control" id="keywordSearchInput" autocomplete="off">
+                        <ul style="overflow: hidden;display: none; position: absolute;z-index: 99;width: 300px;" class="list-group" id="selectedKeyword">
+                        </ul>
+                        <!--<select  class="form-control" name="selectedKeyword"  size="3">
+                            <option value="">option1</option>
+                            <option value="">option2</option>
+                        </select>!-->
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
+                <script>
+                    function delay(callback, ms) {
+                        var timer = 0;
+                        return function() {
+                            var context = this, args = arguments;
+                            clearTimeout(timer);
+                            timer = setTimeout(function () {
+                                callback.apply(context, args);
+                            }, ms || 0);
+                        };
+                    }
+                    $('#keywordSearchInput').keyup(delay(function (e) {
+                        if (this.value.trim() !== '') {
+                            console.log(this.value);
+                            getKeywords(this.value);
+                        }
+                        else {
+                            $('#selectedKeyword').css('display', 'none');
+                        }
+                    }, 350));
+
+                    function getKeywords(startString) {
+                        var data = new FormData();
+                        data.append('keyword', startString);
+                        $.ajax({
+                            url: "<?= \yii\helpers\Url::base() ?>/keyword-search",
+                            type: 'POST',
+                            data: data,
+                            contentType: false,
+                            processData: false,
+                            success: function (data) {
+                                console.log(data);
+                                if (data.length) {
+                                    var select = $('#selectedKeyword');
+                                    select.css('display', 'block');
+                                    var options = '';
+                                    for (var i = 0; i < data.length; i++) {
+                                        console.log(data[i].keyword)
+                                        options += ('<li class="list-group-item">' + data[i].keyword + '</li>');
+                                    }
+                                    select.html(options);
+                                    select.attr('size', data.length);
+
+                                }
+                            }
+                        });
+                    }
+
+                    $('#keySearch').on('submit', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if ($('#keywordSearchInput').val() !== '') {
+                            var data = new FormData();
+                            data.append('keyword', $('#keywordSearchInput').val());
+                            $.ajax({
+                                url: "<?= \yii\helpers\Url::base() ?>/keyword-search",
+                                type: 'POST',
+                                data: data,
+                                contentType: false,
+                                processData: false,
+                                success: function (data) {
+                                    console.log(data);
+                                    if (data.length) {
+                                        var select = $('#selectedKeyword');
+                                        select.css('display', 'block');
+                                        var options = '';
+                                        for (var i = 0; i < data.length; i++) {
+                                            console.log(data[i].keyword)
+                                            options += ('<li class="list-group-item">' + data[i].keyword + '</li>');
+                                        }
+                                        select.html(options);
+                                        select.attr('size', data.length);
+
+                                    }
+                                }
+                            });
+                        }
+                    })
+                </script>
+            </div>
+        </div>
+    </div>
+    <div class="container">
         <?= $content ?>
     </div>
 </div>

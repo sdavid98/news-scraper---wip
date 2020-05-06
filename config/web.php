@@ -73,6 +73,7 @@ $config = [
                 'games' => 'site/games',
                 'others' => 'site/others',
                 'generate' => 'site/generate',
+                'keyword-search' => 'site/keyword',
                 'articles/<id>' => 'article/index'
             ],
         ],

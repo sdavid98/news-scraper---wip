@@ -88,6 +88,16 @@ class SiteController extends Controller
         return $this->render('article/'.$id, ['model' => ['id' => $id]]);
     }
 
+    public function actionKeyword()
+    {
+        //TODO: validation before passing value to query
+        if (Yii::$app->request->post('keyword')) {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            return Keyword::getKeywordsForSearchByFirstLetters(Yii::$app->request->post('keyword'));
+        }
+        return false;
+    }
+
 
     /**
      * @return string
