@@ -29,6 +29,7 @@ class Topic extends \yii\db\ActiveRecord
     }
 
     public static function getTopicNameByUrl($url) {
+        //TODO: make table based on iab taxanomy
         $response = file_get_contents('https://sandbox.aylien.com/textapi/classify/iab-qag?taxonomy=iab-qag&language=en&url=' . $url);
         $myTopic = '';
         $topics = json_decode($response)->categories;
@@ -53,13 +54,38 @@ class Topic extends \yii\db\ActiveRecord
                 $myTopic = 'politics';
                 break;
             }
-            if (in_array($topic->label, ['News', 'Home & Garden', 'Automotive'])) {
-                $myTopic = 'others';
-                break;
-            }
+
+            $myTopic = 'others';
+            break;
+
         }
 
         return $myTopic;
+    }
+
+    public static function getTopicNameByText($text) {
+        $options = array(
+            'http' => array(
+                'method'  => 'POST',
+                'header'  => "Authorization: Token PZ9PZYoSx7l7\r\nContent-Type: application/json\r\n",
+                'content' => '{"texts": ["'. $text .'"]}',
+            ),
+        );
+        $context  = stream_context_create($options);
+        $result = file_get_contents('https://api.uclassify.com/v1/uClassify/iab-taxonomy/classify', false, $context);
+
+        $result =  json_decode($result, true);
+        $classifications = $result[0]['classification'];
+        $max = 0;
+        $topic = '';
+        foreach($classifications as $classification) {
+            if ($classification['p'] > $max) {
+                $max = $classification['p'] - 0;
+                $topic = $classification['className'];
+            }
+        }
+
+        return $topic;
     }
 
     /**

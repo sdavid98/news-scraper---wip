@@ -99,29 +99,34 @@ class Article extends \yii\db\ActiveRecord
         return false;
     }
 
-    public function writeArticleFile($text, $article) {
-        $keywords = [];
-        foreach (Keyword::findAll(['article_id' => $article->id]) as $keyword) {
-            array_push($keywords, $keyword->keyword);
-        }
-        $content = [
-            'created' => $article->created,
-            'logo' => Sourcelogo::findOne($article->sourcelogo_id)->imagename,
-            'title' => $article->title,
-            'link' => $article->external_link,
-            'topicName' => Topic::findOne($article->topic_id)->topic_title,
-            'keywords' => $keywords,
-            'text' => $text
-        ];
-
-        file_put_contents("../views/article/" . $this->filename . ".php", print_r(trim('<?php $info = ', "'"), true));
-        file_put_contents("../views/article/" . $this->filename . ".php", var_export($content, true), FILE_APPEND);
-        file_put_contents("../views/article/" . $this->filename . ".php", print_r(trim(";\r\ninclude '../src/article-body.php';", '"'), true), FILE_APPEND);
-    }
 
     public static function getSummaryByUrl($url) {
-        $response = file_get_contents('https://sandbox.aylien.com/textapi/summarize?language=en&sentences_number=10&url=' . $url);
-        return [join(' ', json_decode($response)->sentences), substr(json_decode($response)->sentences[0], 0, 120)];
+        $postData = array(
+            'text' => $url,
+            'tab' => 'sm',
+            'options' => ['size' => '50', 'domain' => ''],
+        );
+
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\n",
+                'content' => json_encode($postData)
+            )
+        ));
+        $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
+        $summaryArray = json_decode($response)[0]->summary;
+        $summary = '';
+        foreach ($summaryArray as $sumItem) {
+            $summary .= $sumItem->sentence . ' ';
+        }
+        $myfile = fopen("../sumsum.txt", "w");
+        fwrite($myfile, $summary);
+        fclose($myfile);
+
+        return [$summary, substr($summaryArray[0]->sentence, 0, 140)];
+        //$response = file_get_contents('https://sandbox.aylien.com/textapi/summarize?language=en&sentences_number=10&url=' . $url);
+        //return [join(' ', json_decode($response)->sentences), substr(json_decode($response)->sentences[0], 0, 120)];
     }
 
     public static function generateCode()

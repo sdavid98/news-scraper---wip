@@ -92,6 +92,10 @@ class Keyword extends \yii\db\ActiveRecord
         return self::find()->select('keyword')->where('keyword LIKE :substr', array(':substr' => $letters.'%'))->orderBy('CHAR_LENGTH(keyword)')->limit('7')->all();
     }
 
+    public static function getArticleIdsByKeyword($keyword) {
+        return self::find()->select('article_id')->where('keyword LIKE :substr', array(':substr' => '%'.$keyword.'%'))->distinct()->all();
+    }
+
     /**
      * Gets query for [[Article]].
      *

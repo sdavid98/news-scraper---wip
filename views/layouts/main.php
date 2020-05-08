@@ -25,6 +25,7 @@ AppAsset::register($this);
     <script src="<?= \yii\helpers\Url::base() ?>/js/jquery.js"></script>
     <script src="<?= \yii\helpers\Url::base() ?>/js/popper.js"></script>
     <script src="<?= \yii\helpers\Url::base() ?>/js/bootstrap.js"></script>
+    <?php if (isset($this->context->topicName)) echo("<script>window.topicName ='".$this->context->topicName."';</script>"); ?>
     <?php $this->head() ?>
 </head>
 <body>
@@ -104,7 +105,7 @@ AppAsset::register($this);
     <div class="container">
         <div class="row">
             <div class="col">
-                <form id="keySearch" method="post" action="">
+                <form id="keySearch" method="" action="">
                     <div class="form-group">
                         <label for="keywordSearchInput">Article Link</label>
                         <input type="text" name="keywordSearchInput" class="form-control" id="keywordSearchInput" autocomplete="off">
@@ -131,7 +132,7 @@ AppAsset::register($this);
                     }
                     $('#keywordSearchInput').keyup(delay(function (e) {
                         if (this.value.trim() !== '') {
-                            console.log(this.value);
+                            //console.log(this.value);
                             getKeywords(this.value);
                         }
                         else {
@@ -174,29 +175,35 @@ AppAsset::register($this);
                             var data = new FormData();
                             data.append('keyword', $('#keywordSearchInput').val());
                             $.ajax({
-                                url: "<?= \yii\helpers\Url::base() ?>/keyword-search",
-                                type: 'POST',
-                                data: data,
+                                url: "<?= \yii\helpers\Url::base() ?>/keyword-search?keyword=" + $('#keywordSearchInput').val(),
+                                type: 'GET',
                                 contentType: false,
                                 processData: false,
-                                success: function (data) {
-                                    console.log(data);
-                                    if (data.length) {
-                                        var select = $('#selectedKeyword');
-                                        select.css('display', 'block');
-                                        var options = '';
-                                        for (var i = 0; i < data.length; i++) {
-                                            console.log(data[i].keyword)
-                                            options += ('<li class="list-group-item">' + data[i].keyword + '</li>');
-                                        }
-                                        select.html(options);
-                                        select.attr('size', data.length);
-
-                                    }
-                                }
+                                success: writeOutArticles
                             });
                         }
-                    })
+                    });
+
+                    function writeOutArticles(articles) {
+                        var content = '';
+                        for (var i = 0; i < articles.length; i++) {
+                            content += '<div class="col-12"><p>' + articles[i].created + '<br>' + articles[i].topic_title;
+                            var keywords = articles[i].keywords.split(',');
+                            for (var j = 0; j < keywords.length; j++) {
+                                content += '<span>' + keywords[j] + '</span>';
+                            }
+                            content += '</p>';
+                            content += '<img style="vertical-align: top; margin-top: 4px;" class="md-icon" width="35" src="/assets/images/source-logos/' + articles[i].imagename + '">';
+                            content += `<a style="width: 80%; display: inline-block" href="/articles/${articles[i].filename}">
+                                            <div>
+                                                <h2 style="margin-top: 0">${articles[i].title}</h2>
+                                                <p>${articles[i].first_row}</p>
+                                            </div>
+                                        </a>
+                                    </div>`;
+                        }
+                        $('#articleHolder').html(content);
+                    }
                 </script>
             </div>
         </div>

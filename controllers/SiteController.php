@@ -7,6 +7,7 @@ use app\models\Keyword;
 use Yii;
 use yii\db\Query;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
@@ -90,10 +91,29 @@ class SiteController extends Controller
 
     public function actionKeyword()
     {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         //TODO: validation before passing value to query
         if (Yii::$app->request->post('keyword')) {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return Keyword::getKeywordsForSearchByFirstLetters(Yii::$app->request->post('keyword'));
+        }
+
+        if (Yii::$app->request->get('keyword')) {
+            $keywords = Keyword::getArticleIdsByKeyword(Yii::$app->request->get('keyword'));
+            $ids = [];
+            foreach ($keywords as $keyword) {
+                array_push($ids, $keyword->article_id);
+            }
+
+            $query = new Query();
+            $query->select('article.*, topic.topic_title, sourcelogo.imagename, GROUP_CONCAT(keyword.keyword) as keywords')
+                ->from('article')
+                ->leftJoin('topic', 'topic.id = article.topic_id')
+                ->leftJoin('sourcelogo', 'sourcelogo.id = article.sourcelogo_id')
+                ->leftJoin('keyword', 'keyword.article_id = article.id')
+                ->where(['in', 'article.id', $ids])
+                ->groupBy('article.id')
+                ->orderBy('article.created DESC');
+            return $query->all();
         }
         return false;
     }
