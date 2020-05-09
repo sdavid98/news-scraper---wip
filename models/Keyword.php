@@ -57,7 +57,7 @@ class Keyword extends \yii\db\ActiveRecord
         }
     }
 
-    public static function getTitleAndKeywordsByUrl($url) {
+    public static function getTitleAndKeywordsAndTopicIdByUrl($url) {
         $postData = array(
             'text' => $url,
             'tab' => 'ae',
@@ -74,6 +74,7 @@ class Keyword extends \yii\db\ActiveRecord
         $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
         $title = json_decode($response)->{'article title'};
         $text = json_decode($response)->text;
+        $topicId = Topic::getTopicIdByText($text);
 
         $context = stream_context_create(array(
             'http' => array(
@@ -85,7 +86,7 @@ class Keyword extends \yii\db\ActiveRecord
         $response = file_get_contents('https://languages.cortical.io/rest/text/keywords?retina_name=en_general', FALSE, $context);
         $keywords = json_decode($response);
 
-        return [$title, $keywords];
+        return [$title, $keywords, $topicId];
     }
 
     public static function getKeywordsForSearchByFirstLetters($letters) {

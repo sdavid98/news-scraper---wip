@@ -75,12 +75,11 @@ class Article extends \yii\db\ActiveRecord
     }
 
     public static function saveArticleFromGeneratedData($url) {
-        [$title, $keywords] = Keyword::getTitleAndKeywordsByUrl($url);
-        $topicName = Topic::getTopicNameByUrl($url);
+        [$title, $keywords, $topicId] = Keyword::getTitleAndKeywordsAndTopicIdByUrl($url);
 
         $article = new Article();
         $article->code = self::generateCode();
-        $article->topic_id = Topic::getTopicIdByTopicName($topicName);
+        $article->topic_id = $topicId;
         $article->title = $title;
         $article->filename = str_replace('+', '-' , urlencode(strtolower(preg_replace("/[^0-9a-zA-Z \-]/", "", $article->title . '-' . $article->code))));
         [$article->summary, $article->first_row] = self::getSummaryByUrl($url);

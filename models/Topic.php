@@ -29,7 +29,6 @@ class Topic extends \yii\db\ActiveRecord
     }
 
     public static function getTopicNameByUrl($url) {
-        //TODO: make table based on iab taxanomy
         $response = file_get_contents('https://sandbox.aylien.com/textapi/classify/iab-qag?taxonomy=iab-qag&language=en&url=' . $url);
         $myTopic = '';
         $topics = json_decode($response)->categories;
@@ -63,6 +62,10 @@ class Topic extends \yii\db\ActiveRecord
         return $myTopic;
     }
 
+    public static function getTopicIdByText($text) {
+        return self::getTopicIdByTopicName(self::getTopicNameByText($text));
+    }
+
     public static function getTopicNameByText($text) {
         $options = array(
             'http' => array(
@@ -83,6 +86,41 @@ class Topic extends \yii\db\ActiveRecord
                 $max = $classification['p'] - 0;
                 $topic = $classification['className'];
             }
+        }
+
+        switch (explode("_",$topic)[sizeof(explode("_",$topic))-2]) {
+            case 1:
+            case 8:
+            case 9:
+                $topic = 'entertainment';
+                break;
+            case 3:
+            case 4:
+            case 13:
+                $topic = 'business';
+                break;
+            case 11:
+                $topic = 'politics';
+                break;
+            case 7:
+                $topic = 'health';
+                break;
+            case 17:
+                $topic = 'sports';
+                break;
+            case 15:
+                $topic = 'science';
+                break;
+            case 19:
+                $topic = 'tech';
+                break;
+            case 5:
+            case 6:
+            case 14:
+                $topic = 'society';
+                break;
+            default:
+                $topic = 'other';
         }
 
         return $topic;
