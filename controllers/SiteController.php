@@ -47,6 +47,32 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $this->topicName = 'main';
+
+        if (Yii::$app->request->get('keyword')) {
+            $keywords = Keyword::getArticleIdsByKeyword(Yii::$app->request->get('keyword'));
+            $ids = [];
+            foreach ($keywords as $keyword) {
+                array_push($ids, $keyword->article_id);
+            }
+
+            $query = new Query();
+            $query->select('article.*, topic.topic_title, sourcelogo.imagename, GROUP_CONCAT(keyword.keyword) as keywords')
+                ->from('article')
+                ->leftJoin('topic', 'topic.id = article.topic_id')
+                ->leftJoin('sourcelogo', 'sourcelogo.id = article.sourcelogo_id')
+                ->leftJoin('keyword', 'keyword.article_id = article.id')
+                ->where(['in', 'article.id', $ids])
+                ->groupBy('article.id')
+                ->orderBy('article.created DESC');
+            return $this->render('index', [
+                'model' => $query->all(),
+                'displayConfig' => [
+                    'showTopic' => true
+                ]
+            ]);
+        }
+
         $query = new Query();
         $query->select('article.*, topic.topic_title, sourcelogo.imagename, GROUP_CONCAT(keyword.keyword) as keywords')
             ->from('article')
@@ -97,24 +123,6 @@ class SiteController extends Controller
             return Keyword::getKeywordsForSearchByFirstLetters(Yii::$app->request->post('keyword'));
         }
 
-        if (Yii::$app->request->get('keyword')) {
-            $keywords = Keyword::getArticleIdsByKeyword(Yii::$app->request->get('keyword'));
-            $ids = [];
-            foreach ($keywords as $keyword) {
-                array_push($ids, $keyword->article_id);
-            }
-
-            $query = new Query();
-            $query->select('article.*, topic.topic_title, sourcelogo.imagename, GROUP_CONCAT(keyword.keyword) as keywords')
-                ->from('article')
-                ->leftJoin('topic', 'topic.id = article.topic_id')
-                ->leftJoin('sourcelogo', 'sourcelogo.id = article.sourcelogo_id')
-                ->leftJoin('keyword', 'keyword.article_id = article.id')
-                ->where(['in', 'article.id', $ids])
-                ->groupBy('article.id')
-                ->orderBy('article.created DESC');
-            return $query->all();
-        }
         return false;
     }
 
@@ -127,7 +135,6 @@ class SiteController extends Controller
 
         if (Yii::$app->request->post('link')) {
             $url = Yii::$app->request->post('link');
-            //$createdArticleData = Article::createArticleDataFromUrl($url);
             $articleId = Article::saveArticleFromGeneratedData($url);
 
             return $this->render('generate', ['model' => ['id' => $articleId]]);

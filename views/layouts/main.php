@@ -105,16 +105,12 @@ AppAsset::register($this);
     <div class="container">
         <div class="row">
             <div class="col">
-                <form id="keySearch" method="" action="">
+                <form id="keySearch" method="GET" onsubmit="return validateForm()" action="<?= \yii\helpers\Url::base() . $this->context->topicName ?>">
                     <div class="form-group">
-                        <label for="keywordSearchInput">Article Link</label>
-                        <input type="text" name="keywordSearchInput" class="form-control" id="keywordSearchInput" autocomplete="off">
+                        <label for="keyword">Article Link</label>
+                        <input type="text" name="keyword" class="form-control" id="keyword" autocomplete="off">
                         <ul style="overflow: hidden;display: none; position: absolute;z-index: 99;width: 300px;" class="list-group" id="selectedKeyword">
                         </ul>
-                        <!--<select  class="form-control" name="selectedKeyword"  size="3">
-                            <option value="">option1</option>
-                            <option value="">option2</option>
-                        </select>!-->
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -130,9 +126,8 @@ AppAsset::register($this);
                             }, ms || 0);
                         };
                     }
-                    $('#keywordSearchInput').keyup(delay(function (e) {
+                    $('#keyword').keyup(delay(function (e) {
                         if (this.value.trim() !== '') {
-                            //console.log(this.value);
                             getKeywords(this.value);
                         }
                         else {
@@ -150,13 +145,11 @@ AppAsset::register($this);
                             contentType: false,
                             processData: false,
                             success: function (data) {
-                                console.log(data);
                                 if (data.length) {
                                     var select = $('#selectedKeyword');
                                     select.css('display', 'block');
                                     var options = '';
                                     for (var i = 0; i < data.length; i++) {
-                                        console.log(data[i].keyword)
                                         options += ('<li class="list-group-item">' + data[i].keyword + '</li>');
                                     }
                                     select.html(options);
@@ -167,22 +160,12 @@ AppAsset::register($this);
                         });
                     }
 
-                    $('#keySearch').on('submit', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        if ($('#keywordSearchInput').val() !== '') {
-                            var data = new FormData();
-                            data.append('keyword', $('#keywordSearchInput').val());
-                            $.ajax({
-                                url: "<?= \yii\helpers\Url::base() ?>/keyword-search?keyword=" + $('#keywordSearchInput').val(),
-                                type: 'GET',
-                                contentType: false,
-                                processData: false,
-                                success: writeOutArticles
-                            });
+                    function validateForm() {
+                        if ($('#keyword').val().trim() === '') {
+                            return false;
                         }
-                    });
+                    }
+
 
                     function writeOutArticles(articles) {
                         var content = '';
@@ -220,7 +203,7 @@ AppAsset::register($this);
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
-<script src="<?= \yii\helpers\Url::base() ?>/js/build.js"></script>
+
 <?php $this->endBody() ?>
 </body>
 </html>

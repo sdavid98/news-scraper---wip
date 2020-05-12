@@ -25,7 +25,7 @@ class Topic extends \yii\db\ActiveRecord
     }
 
     public static function getTopicIdByTopicName($name) {
-        return self::findOne(['topic_title' => trim(strtolower($name))])->id;
+        return self::findOne(['topic_title' => $name])->id;
     }
 
     public static function getTopicNameByUrl($url) {
@@ -67,11 +67,23 @@ class Topic extends \yii\db\ActiveRecord
     }
 
     public static function getTopicNameByText($text) {
+        /*$postData = array(
+            'texts' => $text
+        );
+
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => "Authorization: Token PZ9PZYoSx7l7\r\nContent-Type: application/json\r\n",
+                'content' => json_encode($postData)
+            )
+        ));*/
+
         $options = array(
             'http' => array(
                 'method'  => 'POST',
                 'header'  => "Authorization: Token PZ9PZYoSx7l7\r\nContent-Type: application/json\r\n",
-                'content' => '{"texts": ["'. $text .'"]}',
+                'content' => json_encode(array('texts' => [$text]))
             ),
         );
         $context  = stream_context_create($options);
@@ -120,9 +132,11 @@ class Topic extends \yii\db\ActiveRecord
                 $topic = 'society';
                 break;
             default:
-                $topic = 'other';
+                $topic = 'others';
         }
-
+        $myfile = fopen("../topic.txt", "w");
+        fwrite($myfile, $topic);
+        fclose($myfile);
         return $topic;
     }
 

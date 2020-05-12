@@ -57,7 +57,7 @@ class Keyword extends \yii\db\ActiveRecord
         }
     }
 
-    public static function getTitleAndKeywordsAndTopicIdByUrl($url) {
+    public static function getTitleAndKeywordsAndTopicNameByUrl($url) {
         $postData = array(
             'text' => $url,
             'tab' => 'ae',
@@ -74,7 +74,7 @@ class Keyword extends \yii\db\ActiveRecord
         $response = file_get_contents('https://www.summarizebot.com/scripts/text_analysis.py', FALSE, $context);
         $title = json_decode($response)->{'article title'};
         $text = json_decode($response)->text;
-        $topicId = Topic::getTopicIdByText($text);
+        $topicName = Topic::getTopicNameByText($text);
 
         $context = stream_context_create(array(
             'http' => array(
@@ -86,11 +86,11 @@ class Keyword extends \yii\db\ActiveRecord
         $response = file_get_contents('https://languages.cortical.io/rest/text/keywords?retina_name=en_general', FALSE, $context);
         $keywords = json_decode($response);
 
-        return [$title, $keywords, $topicId];
+        return [$title, $keywords, $topicName];
     }
 
     public static function getKeywordsForSearchByFirstLetters($letters) {
-        return self::find()->select('keyword')->where('keyword LIKE :substr', array(':substr' => $letters.'%'))->orderBy('CHAR_LENGTH(keyword)')->limit('7')->all();
+        return self::find()->select('keyword')->distinct()->where('keyword LIKE :substr', array(':substr' =>'%'.$letters.'%'))->orderBy('CHAR_LENGTH(keyword)')->limit('7')->all();
     }
 
     public static function getArticleIdsByKeyword($keyword) {
